@@ -48,6 +48,11 @@ h2 {
     margin-bottom: 20px;
 }
 
+.message {
+    margin-top: 20px;
+    font-size: 3rem;
+}
+
 .modes {
     display: flex;
     flex-direction: column;
@@ -128,6 +133,12 @@ h2 {
 
 .cell {
     border: 3px solid white;
+    display: flex;
+    justify-content: center;
+}
+
+.cell > img {
+    width: 80%;
 }
 
 .cell:nth-of-type(1),
