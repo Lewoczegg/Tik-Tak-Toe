@@ -49,6 +49,7 @@ h2 {
 }
 
 .message {
+    display: none;
     margin-top: 20px;
     font-size: 3rem;
 }
@@ -125,7 +126,7 @@ h2 {
 /* Board */
 .board {
     margin: 20px;
-    display: grid;
+    display: none;
     grid-template-columns: repeat(3, 100px);
     grid-template-rows: repeat(3, 100px);
     justify-content: center;
@@ -139,6 +140,14 @@ h2 {
 
 .cell > img {
     width: 80%;
+}
+
+.cell.cell-animating > img {
+    animation: sign-in 1s;
+}
+
+.cell.highlight {
+    background-color: #62c3cc;
 }
 
 .cell:nth-of-type(1),
@@ -173,8 +182,10 @@ h2 {
     border-radius: 20px;
     border: 0;
     margin: 0 auto;
+    margin-bottom: 10px;
     font-size: 1.6rem;
     font-weight: 700;
+    display: none;
 }
 
 #reset:hover {
@@ -194,5 +205,19 @@ h2 {
     .board {
         grid-template-columns: repeat(3, 200px);
         grid-template-rows: repeat(3, 200px);
+    }
+}
+
+@keyframes sign-in {
+    0% {
+        transform: scale(1.1);
+    }
+
+    50% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }

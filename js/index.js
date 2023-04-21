@@ -6,32 +6,32 @@ const gameBoard = (() => {
   const checkForWin = () => {
     // Check rows
     if (board[0] !== '' && board[0] === board[1] && board[1] === board[2]) {
-      return true;
+      return [0, 1, 2];
     }
     if (board[3] !== '' && board[3] === board[4] && board[4] === board[5]) {
-      return true;
+      return [3, 4, 5];
     }
     if (board[6] !== '' && board[6] === board[7] && board[7] === board[8]) {
-      return true;
+      return [6, 7, 8];
     }
 
     // Check columns
     if (board[0] !== '' && board[0] === board[3] && board[3] === board[6]) {
-      return true;
+      return [0, 3, 6];
     }
     if (board[1] !== '' && board[1] === board[4] && board[4] === board[7]) {
-      return true;
+      return [1, 4, 7];
     }
     if (board[2] !== '' && board[2] === board[5] && board[5] === board[8]) {
-      return true;
+      return [2, 5, 8];
     }
 
     // Check digonals
     if (board[0] !== '' && board[0] === board[4] && board[4] === board[8]) {
-      return true;
+      return [0, 4, 8];
     }
     if (board[2] !== '' && board[2] === board[4] && board[4] === board[6]) {
-      return true;
+      return [2, 4, 6];
     }
 
     return false;
@@ -73,19 +73,32 @@ const gameBoard = (() => {
 })();
 
 const gameController = (() => {
+  const main = document.querySelector('main');
   const cells = document.querySelectorAll('.cell');
   const message = document.querySelector('.message');
   const resetButton = document.querySelector('#reset');
   const humanButton = document.querySelector('#human');
   const aiButton = document.querySelector('#ai');
+  const boardEl = document.querySelector('.board');
   let againstAI = false;
 
   const init = () => {
     cells.forEach((cell, index) => {
       cell.addEventListener('click', () => {
         if (gameBoard.makeMove(index)) {
+          for (let i = 0; i < 9; i++) {
+            if (cells[i].classList.contains('cell-animating')) {
+              cells[i].classList.remove('cell-animating');
+            }
+          }
+          cell.classList.add('cell-animating');
           render();
         }
+      });
+
+      cell.addEventListener('animationend', () => {
+        cell.classList.remove('cell-animating');
+        boardEl.classList.remove('running');
       });
     });
 
@@ -93,14 +106,25 @@ const gameController = (() => {
 
     humanButton.addEventListener('click', () => {
       againstAI = false;
+      main.classList.add('in-game');
+      humanButton.classList.add('active');
+      aiButton.classList.remove('active');
+      boardEl.style.display = 'grid';
+      message.style.display = 'block';
+      resetButton.style.display = 'block';
       reset();
     });
 
     aiButton.addEventListener('click', () => {
       againstAI = true;
+      aiButton.classList.add('active');
+      humanButton.classList.remove('active');
+      main.classList.add('in-game');
+      boardEl.style.display = 'grid';
+      message.style.display = 'block';
+      resetButton.style.display = 'block';
       reset();
     });
-
     render();
   };
 
@@ -121,6 +145,12 @@ const gameController = (() => {
 
     if (gameOver) {
       if (gameBoard.checkForWin()) {
+        const winningCombination = gameBoard.checkForWin();
+        for (let i = 0; i < 9; i++) {
+          if (winningCombination.includes(i)) {
+            cells[i].classList.add('highlight');
+          }
+        }
         message.textContent = `${currentPlayer} wins!`;
       } else {
         message.textContent = 'Tie';
@@ -130,9 +160,8 @@ const gameController = (() => {
 
       if (againstAI && currentPlayer === 'O') {
         const aiMove = aiPlayer.makeMove();
-        if (gameBoard.makeMove(aiMove)) {
-          render();
-        }
+        gameBoard.makeMove(aiMove);
+        render();
       }
     }
   };
@@ -140,6 +169,7 @@ const gameController = (() => {
   const reset = () => {
     cells.forEach((cell) => {
       cell.innerHTML = '';
+      cell.classList.remove('highlight');
     });
     gameBoard.reset();
     render();
