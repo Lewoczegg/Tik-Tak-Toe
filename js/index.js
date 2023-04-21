@@ -1,12 +1,3 @@
-const modeButtons = document.querySelectorAll('.modes > button');
-
-modeButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    button.parentNode.parentNode.classList.add('in-game');
-    button.classList.add('active');
-  });
-});
-
 const gameBoard = (() => {
   let board = ['', '', '', '', '', '', '', '', ''];
   let currentPlayer = 'X';
@@ -83,11 +74,13 @@ const gameBoard = (() => {
 
 const gameController = (() => {
   const cells = document.querySelectorAll('.cell');
-  const resetButton = document.querySelector('#reset');
   const message = document.querySelector('.message');
+  const resetButton = document.querySelector('#reset');
+  const humanButton = document.querySelector('#human');
+  const aiButton = document.querySelector('#ai');
+  let againstAI = false;
 
   const init = () => {
-    console.log('hey');
     cells.forEach((cell, index) => {
       cell.addEventListener('click', () => {
         if (gameBoard.makeMove(index)) {
@@ -96,12 +89,16 @@ const gameController = (() => {
       });
     });
 
-    resetButton.addEventListener('click', () => {
-      cells.forEach((cell) => {
-        cell.innerHTML = '';
-      });
-      gameBoard.reset();
-      render();
+    resetButton.addEventListener('click', reset);
+
+    humanButton.addEventListener('click', () => {
+      againstAI = false;
+      reset();
+    });
+
+    aiButton.addEventListener('click', () => {
+      againstAI = true;
+      reset();
     });
 
     render();
@@ -130,11 +127,41 @@ const gameController = (() => {
       }
     } else {
       message.textContent = `${currentPlayer} turn`;
+
+      if (againstAI && currentPlayer === 'O') {
+        const aiMove = aiPlayer.makeMove();
+        if (gameBoard.makeMove(aiMove)) {
+          render();
+        }
+      }
     }
+  };
+
+  const reset = () => {
+    cells.forEach((cell) => {
+      cell.innerHTML = '';
+    });
+    gameBoard.reset();
+    render();
   };
 
   return {
     init,
+  };
+})();
+
+const aiPlayer = (() => {
+  const makeMove = () => {
+    const avialableMoves = gameBoard.getBoard().map((cell, index) => {
+      if (cell === '') return index;
+      return null;
+    }).filter((index) => index !== null);
+
+    return avialableMoves[Math.floor(Math.random() * avialableMoves.length)];
+  };
+
+  return {
+    makeMove,
   };
 })();
 
