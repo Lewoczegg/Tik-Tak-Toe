@@ -80,6 +80,8 @@ const gameController = (() => {
   const humanButton = document.querySelector('#human');
   const aiButton = document.querySelector('#ai');
   const boardEl = document.querySelector('.board');
+  const settingsButton = document.querySelector('.settings');
+  const aiSettingsEl = document.querySelector('.ai-settings');
   let againstAI = false;
 
   const init = () => {
@@ -125,6 +127,11 @@ const gameController = (() => {
       resetButton.style.display = 'block';
       reset();
     });
+
+    settingsButton.addEventListener('click', () => {
+      aiSettingsEl.classList.toggle('toggle');
+    });
+
     render();
   };
 

@@ -18,12 +18,12 @@ body {
 
 /* Header */
 header {
+    align-items: center;
     align-content: center;
     display: flex;
     flex-direction: row;
     justify-content: center;
     margin: 20px;
-    margin-bottom: 40px;
 }
 
 header .logo {
@@ -31,8 +31,59 @@ header .logo {
     margin-right: 10px;
 }
 
+header .settings {
+    height: 3rem;
+    margin-left: auto;
+}
+
 header h1 {
-    font-size: 4.5rem;
+    font-size: 4.3rem;
+}
+
+/* Settings */
+.ai-settings {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: 0;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.ai-settings.toggle {
+    height: 70px;
+    opacity: 1;
+    margin-bottom: 10px;
+}
+
+.diffictulty {
+    display: none;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-settings.toggle .diffictulty {
+    display: flex;
+}
+
+.diffictulty span {
+    font-size: 2rem;
+}
+
+.diffictulty button {
+    display: none;
+    border: 0;
+    font-size: 2rem;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.ai-settings.toggle button {
+    display: block;
 }
 
 /* Main menu */
