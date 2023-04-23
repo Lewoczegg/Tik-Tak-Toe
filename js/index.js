@@ -81,12 +81,15 @@ const gameController = (() => {
   const aiButton = document.querySelector('#ai');
   const boardEl = document.querySelector('.board');
   const settingsButton = document.querySelector('.settings');
+  const xButton = document.querySelector('#x');
+  const oButton = document.querySelector('#o');
   const aiDifficultyEasyButton = document.querySelector('#easy');
   const aiDifficultyMediumButton = document.querySelector('#medium');
   const aiDifficultyHardButton = document.querySelector('#hard');
   const aiSettingsEl = document.querySelector('.ai-settings');
   let againstAI = false;
   let aiDifficulty = 'easy';
+  let aiSymbol = 'O';
 
   const init = () => {
     cells.forEach((cell, index) => {
@@ -157,6 +160,20 @@ const gameController = (() => {
       aiDifficultyHardButton.classList.add('active');
     });
 
+    xButton.addEventListener('click', () => {
+      aiSymbol = 'O';
+      xButton.classList.add('active');
+      oButton.classList.remove('active');
+      reset();
+    });
+
+    oButton.addEventListener('click', () => {
+      aiSymbol = 'X';
+      xButton.classList.remove('active');
+      oButton.classList.add('active');
+      reset();
+    });
+
     render();
   };
 
@@ -190,7 +207,7 @@ const gameController = (() => {
     } else {
       message.textContent = `${currentPlayer} turn`;
 
-      if (againstAI && currentPlayer === 'O') {
+      if (againstAI && currentPlayer === aiSymbol) {
         const aiMove = aiPlayer.makeMove(aiDifficulty);
         gameBoard.makeMove(aiMove);
         render();
@@ -207,8 +224,11 @@ const gameController = (() => {
     render();
   };
 
+  const getAiSymbol = () => aiSymbol;
+
   return {
     init,
+    getAiSymbol,
   };
 })();
 
@@ -240,8 +260,7 @@ const aiPlayer = (() => {
       }
     });
 
-    // Find the move with the highest score if the current player is X
-    if (player === 'X') {
+    if (player !== gameController.getAiSymbol()) {
       let bestScore = -Infinity;
       let bestMove;
       moves.forEach((move) => {
@@ -252,7 +271,7 @@ const aiPlayer = (() => {
       });
       return bestMove;
     }
-    // Find the move with the lowest score if the current player is O
+
     let bestScore = Infinity;
     let bestMove;
     moves.forEach((move) => {
