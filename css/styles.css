@@ -82,6 +82,16 @@ header h1 {
     font-weight: 500;
 }
 
+.diffictulty button:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.diffictulty > button.active {
+    background: #62c3cc;
+}
+
 .ai-settings.toggle button {
     display: block;
 }

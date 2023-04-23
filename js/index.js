@@ -81,8 +81,12 @@ const gameController = (() => {
   const aiButton = document.querySelector('#ai');
   const boardEl = document.querySelector('.board');
   const settingsButton = document.querySelector('.settings');
+  const aiDifficultyEasyButton = document.querySelector('#easy');
+  const aiDifficultyMediumButton = document.querySelector('#medium');
+  const aiDifficultyHardButton = document.querySelector('#hard');
   const aiSettingsEl = document.querySelector('.ai-settings');
   let againstAI = false;
+  let aiDifficulty = 'easy';
 
   const init = () => {
     cells.forEach((cell, index) => {
@@ -132,6 +136,27 @@ const gameController = (() => {
       aiSettingsEl.classList.toggle('toggle');
     });
 
+    aiDifficultyEasyButton.addEventListener('click', () => {
+      aiDifficulty = 'easy';
+      aiDifficultyEasyButton.classList.add('active');
+      aiDifficultyMediumButton.classList.remove('active');
+      aiDifficultyHardButton.classList.remove('active');
+    });
+
+    aiDifficultyMediumButton.addEventListener('click', () => {
+      aiDifficulty = 'medium';
+      aiDifficultyEasyButton.classList.remove('active');
+      aiDifficultyMediumButton.classList.add('active');
+      aiDifficultyHardButton.classList.remove('active');
+    });
+
+    aiDifficultyHardButton.addEventListener('click', () => {
+      aiDifficulty = 'hard';
+      aiDifficultyEasyButton.classList.remove('active');
+      aiDifficultyMediumButton.classList.remove('active');
+      aiDifficultyHardButton.classList.add('active');
+    });
+
     render();
   };
 
@@ -166,7 +191,7 @@ const gameController = (() => {
       message.textContent = `${currentPlayer} turn`;
 
       if (againstAI && currentPlayer === 'O') {
-        const aiMove = aiPlayer.makeMove();
+        const aiMove = aiPlayer.makeMove(aiDifficulty);
         gameBoard.makeMove(aiMove);
         render();
       }
@@ -188,13 +213,71 @@ const gameController = (() => {
 })();
 
 const aiPlayer = (() => {
-  const makeMove = () => {
-    const avialableMoves = gameBoard.getBoard().map((cell, index) => {
-      if (cell === '') return index;
-      return null;
-    }).filter((index) => index !== null);
+  const minimax = (board, player) => {
+    // Check if the game is over and return a score based on the winner
+    if (gameBoard.checkForWin()) {
+      if (gameBoard.getCurrentPlayer() === player) {
+        return { score: 10 };
+      }
+      return { score: -10 };
+    } if (board.every((square) => square !== '')) {
+      // If the game is a tie, return a score of 0
+      return { score: 0 };
+    }
 
-    return avialableMoves[Math.floor(Math.random() * avialableMoves.length)];
+    // Collect scores from each possible move
+    const moves = [];
+    const opponent = player === 'X' ? 'O' : 'X';
+    board.forEach((cell, index) => {
+      if (cell === '') {
+        const move = {};
+        move.index = index;
+        board[index] = player;
+        const result = minimax(board, opponent);
+        move.score = result.score;
+        board[index] = '';
+        moves.push(move);
+      }
+    });
+
+    // Find the move with the highest score if the current player is X
+    if (player === 'X') {
+      let bestScore = -Infinity;
+      let bestMove;
+      moves.forEach((move) => {
+        if (move.score > bestScore) {
+          bestScore = move.score;
+          bestMove = move;
+        }
+      });
+      return bestMove;
+    }
+    // Find the move with the lowest score if the current player is O
+    let bestScore = Infinity;
+    let bestMove;
+    moves.forEach((move) => {
+      if (move.score < bestScore) {
+        bestScore = move.score;
+        bestMove = move;
+      }
+    });
+    return bestMove;
+  };
+
+  const makeMove = (difficulty) => {
+    if (difficulty === 'easy') {
+      const avialableMoves = gameBoard.getBoard().map((cell, index) => {
+        if (cell === '') return index;
+        return null;
+      }).filter((index) => index !== null);
+
+      return avialableMoves[Math.floor(Math.random() * avialableMoves.length)];
+    }
+    if (difficulty === 'hard') {
+      const board = gameBoard.getBoard();
+      const move = minimax(board, gameBoard.getCurrentPlayer());
+      return move.index;
+    }
   };
 
   return {
