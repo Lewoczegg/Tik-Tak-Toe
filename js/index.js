@@ -88,8 +88,9 @@ const gameController = (() => {
   const aiDifficultyHardButton = document.querySelector('#hard');
   const aiSettingsEl = document.querySelector('.ai-settings');
   let againstAI = false;
-  let aiDifficulty = 'easy';
+  let aiDifficulty = 'medium';
   let aiSymbol = 'O';
+  let playerSymbol = 'X';
 
   const init = () => {
     cells.forEach((cell, index) => {
@@ -162,6 +163,7 @@ const gameController = (() => {
 
     xButton.addEventListener('click', () => {
       aiSymbol = 'O';
+      playerSymbol = 'X';
       xButton.classList.add('active');
       oButton.classList.remove('active');
       reset();
@@ -169,6 +171,7 @@ const gameController = (() => {
 
     oButton.addEventListener('click', () => {
       aiSymbol = 'X';
+      playerSymbol = 'O';
       xButton.classList.remove('active');
       oButton.classList.add('active');
       reset();
@@ -225,10 +228,12 @@ const gameController = (() => {
   };
 
   const getAiSymbol = () => aiSymbol;
+  const getPlayerSymbol = () => playerSymbol;
 
   return {
     init,
     getAiSymbol,
+    getPlayerSymbol,
   };
 })();
 
@@ -292,6 +297,62 @@ const aiPlayer = (() => {
 
       return avialableMoves[Math.floor(Math.random() * avialableMoves.length)];
     }
+
+    if (difficulty === 'medium') {
+      const board = gameBoard.getBoard();
+      const aiSymbol = gameController.getAiSymbol();
+      const playerSymbol = gameController.getPlayerSymbol();
+      let bestMove = '';
+
+      // Check for potential winning moves
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === '') {
+          board[i] = aiSymbol;
+          if (gameBoard.checkForWin()) {
+            bestMove = i;
+          }
+          board[i] = '';
+        }
+      }
+
+      if (bestMove !== '') {
+        console.log(bestMove);
+        return bestMove;
+      }
+
+      // Check for potential blocking moves
+      for (let i = 0; i < board.length; i++) {
+        if (board[i] === '') {
+          board[i] = playerSymbol;
+          if (gameBoard.checkForWin()) {
+            bestMove = i;
+          }
+          board[i] = '';
+        }
+      }
+
+      if (bestMove !== '') {
+        console.log(bestMove);
+        return bestMove;
+      }
+
+      // let randomIndex;
+      // do {
+      //   randomIndex = Math.floor(Math.random() * board.length);
+      // } while (board[randomIndex] !== '');
+
+      // board[randomIndex] = aiPlayer;
+      // return randomIndex;
+
+      const avialableMoves = gameBoard.getBoard().map((cell, index) => {
+        if (cell === '') return index;
+        return null;
+      }).filter((index) => index !== null);
+
+      console.log('hey');
+      return avialableMoves[Math.floor(Math.random() * avialableMoves.length)];
+    }
+
     if (difficulty === 'hard') {
       const board = gameBoard.getBoard();
       const move = minimax(board, gameBoard.getCurrentPlayer());
